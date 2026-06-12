@@ -1,21 +1,39 @@
 import { spawn } from 'child_process';
+import fs from "fs";
+import { type } from 'os';
 
+export const executeScript = (path, args = [], onStream = () => {}) => {
 
-export const executeScript = (path) => {
-   const process = spawn("bash", [path]);
+   // const process = spawn("bash", [path]);
 
-   process.stdout.on("data", (data) => {
-      console.log(data.toString());
-   });
-
-   process.stderr.on("data", (data) => {
-      console.error("Err", data.toString());
-   });
-
-   process.on("close", (code) => {
-      if(code){
-         console.log("Err");
+   return new Promise((resolve, reject) => {
+      if(!fs.existsSync(path)){
+         return reject({success : false, error : "Script not found"});
       }
-      console.log(`Exited with code ${code}`);
-   });
+
+      let out = "" , err = "";
+
+      process.stdout.on("data", (data) => {
+         const text = data.toString();
+         out += text;
+         onStream({type : "stdout", message : text});
+      });
+
+      process.stderr.on("data", (data) => {
+         const text = data.toString();
+         err += text;
+         onStream({type : "stderr", message : text});
+      });
+
+      process.on("close", (code) => {
+         if(code == 0){
+            return resolve({ success: true, output: out });
+         }
+         return reject({ success: false, output: out, error: err, code });
+      });
+
+      child.on("error", (error) => {
+         reject({ success: false, error });
+      });
+   })
 };
