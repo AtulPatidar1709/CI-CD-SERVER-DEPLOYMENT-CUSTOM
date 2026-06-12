@@ -7,6 +7,15 @@ import { deploy } from "./utils/deploy";
 const app = express();
 app.use(express.json());
 
+app.get("/health", (_, res) => {
+  res.status(200).json({
+    status: "OK",
+    success: true,
+    message: "Server is healthy",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.post("/webhook/tigger-deployment", verifySignature, async (req, res) => {
    res.status(200).send("OK");
 
