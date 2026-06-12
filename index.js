@@ -19,13 +19,26 @@ app.post("/webhook/tigger-deployment", verifySignature, async (req, res) => {
    let clientChanged = false;
    let serverChanged = false;
 
+   let clientDepsChanged = false;
+   let serverDepsChanged = false;
+
    for(const commit of commits) {
       const files = [...commit.added, ...commit.modified, ...commit.removed];
 
       for(const file of files){
          if(file.startsWith("Client/")) clientChanged = true;
          if(file.startsWith("Server/")) serverChanged = true;
+
+         if (file === "Client/package.json" || file === "Client/package-lock.json") {
+            clientDepsChanged = true;
+         }
+
+         if (file === "Server/package.json" || file === "Server/package-lock.json") {
+            serverDepsChanged = true;
+         }
+
          if(clientChanged && serverChanged ) break;
+
       }
 
       if(clientChanged && serverChanged) break;
@@ -37,11 +50,11 @@ app.post("/webhook/tigger-deployment", verifySignature, async (req, res) => {
    }
 
    if (clientChanged) {
-      await deploy("client", "deploy-client.sh", { commitMessage, commitAuthor });
+      await deploy("client", "deploy-client.sh", needInstall, { commitMessage, commitAuthor });
   }
 
   if (serverChanged) {
-      await deploy("server", "deploy-server.sh", { commitMessage, commitAuthor });
+      await deploy("server", "deploy-server.sh", needInstall, { commitMessage, commitAuthor });
   }
 });
 

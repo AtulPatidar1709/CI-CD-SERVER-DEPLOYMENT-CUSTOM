@@ -2,7 +2,7 @@ import chalk from "chalk";
 
 import { executeScript } from "./executeScript";
 
-export const deploy = async ((service, script, { commitMessage, commitAuthor }) => {
+export const deploy = async ((service, script, needInstall, { commitMessage, commitAuthor }) => {
    console.log(
       chalk.yellow.bold(
          `\n${
@@ -12,7 +12,7 @@ export const deploy = async ((service, script, { commitMessage, commitAuthor }) 
    );
 
    try {
-      const {success} = await executeScript(script, [], logStream(service));
+      const {success} = await executeScript(script, [needInstall], logStream(service));
 
       if (success) {
          console.log(chalk.green.bold("✓ Deployment completed!\n"));
