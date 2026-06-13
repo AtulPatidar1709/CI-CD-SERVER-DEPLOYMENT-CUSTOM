@@ -4,12 +4,14 @@ import { type } from 'os';
 
 export const executeScript = (path, args = [], onStream = () => {}) => {
 
-   // const process = spawn("bash", [path]);
-
    return new Promise((resolve, reject) => {
       if(!fs.existsSync(path)){
          return reject({success : false, error : "Script not found"});
       }
+
+      const child = spawn("bash", [path, ...args], {
+         env : {...process.env},
+      });
 
       let out = "" , err = "";
 

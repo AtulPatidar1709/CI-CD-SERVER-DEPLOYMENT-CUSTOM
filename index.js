@@ -1,8 +1,9 @@
-import express from "express";
-import { verifySignature } from "./middlewares/verifySignature";
-import { executeScript } from "./utils/executeScript";
+import 'dotenv/config'; 
 import chalk from "chalk";
+import express from "express";
 import { deploy } from "./utils/deploy";
+import { executeScript } from "./utils/executeScript";
+import { verifySignature } from "./middlewares/verifySignature";
 
 const app = express();
 app.use(express.json());
